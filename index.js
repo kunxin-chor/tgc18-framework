@@ -41,12 +41,6 @@ app.use(session({
 }))
 
 // enable csrf protection
-
-app.use(function(req,res,next){
-  console.log("req.body ==>", req.body);
-  next();
-})
-
 app.use(csrf());
 
 app.use(function(req,res,next){
@@ -68,6 +62,20 @@ app.use(function(req,res,next){
   next();
 })
 
+// setup a middleware to share data across all hbs files
+app.use(function(req,res,next){
+  res.locals.user = req.session.user;
+  next();
+})
+
+app.use(async function(req,res,next){
+  if (req.session.user) {
+    const cartItems = await getCart(req.session.user.id);
+    res.locals.cartCount = cartItems.toJSON().length;
+  }
+  next();
+});
+
 const landingRoutes = require('./routes/landing');
 const productRoutes = require('./routes/products');
 const userRoutes = require('./routes/users')
@@ -75,6 +83,7 @@ const cloudinaryRoutes = require('./routes/cloudinary');
 const cartRoutes = require('./routes/carts');
 const checkoutRoutes = require('./routes/checkout');
 const { checkIfAuthenticated } = require('./middlewares');
+const { getCart } = require('./dal/carts');
 
 // first arg is the prefix
 app.use('/', landingRoutes);
