@@ -7,6 +7,7 @@ var helpers = require('handlebars-helpers')({
 
 // cors
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 
 //requiring in the dependencies for sessions
 const session = require('express-session');
@@ -105,7 +106,8 @@ const { checkIfAuthenticated } = require('./middlewares');
 const { getCart } = require('./dal/carts');
 
 const api = {
-  products: require('./routes/api/products')
+  products: require('./routes/api/products'),
+  users: require('./routes/api/users')
 }
 
 // first arg is the prefix
@@ -118,6 +120,7 @@ app.use('/checkout', checkoutRoutes);
 
 // register api routes
 app.use('/api/products', express.json(), api.products);
+app.use('/api/users', express.json(), api.users);
 
 app.listen(3000, function(){
     console.log("Server has started");
